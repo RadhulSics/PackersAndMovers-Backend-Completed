@@ -3,34 +3,60 @@ const LuggageSchema = require('../Packer/LuggageSchema');
 const driverSchema = require('./driverSchema');
 const drivers=require('./driverSchema')
 const locationupdates=require('./locationUpdateSchema')
-
-const registerDriver=(req,res)=>{
-  console.log(req.body.name);
-    const newDriver=new drivers({
-        name:req.body.name,
-        gender:req.body.gender,
-        mid:req.body.mid,
-        licenceNo:req.body.licenceNo,
-        contact:req.body.contact,
-        email:req.body.email,
-        password:req.body.password
+const registerDriver=async(req,res)=>{
+    let lic=0,ph=0
+   await drivers.find({licenceNo:req.body.licenceNo}).then(dat=>{
+if(dat!=null){
+    lic=1
+}
+    }).catch(err=>{
+        console.log(err);
     })
-    newDriver.save().then(data=>{
-        res.json({
-            status:200,
-            msg:"Inserted successfully",
+    await drivers.find({contact:req.body.contact}).then(dat=>{
+        if(dat!=null){
+            ph=1
+        }
+            }).catch(err=>{
+                console.log(err);
+            })
+    console.log(req.body.name);
+      const newDriver=new drivers({
+          name:req.body.name,
+          gender:req.body.gender,
+          mid:req.body.mid,
+          licenceNo:req.body.licenceNo,
+          contact:req.body.contact,
+          email:req.body.email,
+          password:req.body.password
+      })
+      if(ph==1){
+        return  res.json({
+            status:405,
+            msg:"Licence number already exists !",
             data:data
         })
-    }).catch(err=>{
-        res.json({
-            status:500,
-            msg:"Data not Inserted",
-            Error:err
+    }else if(lic==1){
+        return  res.json({
+            status:405,
+            msg:"Licence number already exists !",
         })
-    })
-}
-//Driver Registration -- finished
-
+    }else{
+     await newDriver.save().then(data=>{
+          res.json({
+              status:200,
+              msg:"Inserted successfully",
+              data:data
+          })
+      }).catch(err=>{
+          res.json({
+              status:500,
+              msg:"Data not Inserted",
+              Error:err
+          })
+      })
+    }
+  }
+  //Driver Registration -- finished
 
 
 //View all Drivers
