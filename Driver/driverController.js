@@ -5,14 +5,18 @@ const drivers=require('./driverSchema')
 const locationupdates=require('./locationUpdateSchema')
 const registerDriver=async(req,res)=>{
     let lic=0,ph=0
-   await drivers.find({licenceNo:req.body.licenceNo}).then(dat=>{
+   await drivers.findOne({licenceNo:req.body.licenceNo}).then(dat=>{
+    console.log("data",dat);
 if(dat!=null){
+  console.log("in ifd,",dat);
     lic=1
 }
     }).catch(err=>{
         console.log(err);
     })
-    await drivers.find({contact:req.body.contact}).then(dat=>{
+    await drivers.findOne({contact:req.body.contact}).then(dat=>{
+      console.log("data",dat);
+
         if(dat!=null){
             ph=1
         }
@@ -32,8 +36,7 @@ if(dat!=null){
       if(ph==1){
         return  res.json({
             status:405,
-            msg:"Licence number already exists !",
-            data:data
+            msg:"contact number already exists !",
         })
     }else if(lic==1){
         return  res.json({
